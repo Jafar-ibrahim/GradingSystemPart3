@@ -33,18 +33,18 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         String username = authentication.getName();
         HttpSession session = request.getSession();
-        int userId = userService.getIdByUsername(username);
+        int currentUserId = userService.getIdByUsername(username);
         //session.setAttribute("user_id",userId);
         if (roles.contains("ADMIN")) {
-            redirectStrategy.sendRedirect(request, response, "/admin_view?user_id="+userId);
+            redirectStrategy.sendRedirect(request, response, "/admin/admin_view?current_user_id="+currentUserId);
         }else if(roles.contains("INSTRUCTOR")){
-            int instructorId = userService.getSpecificId(userId,2);
-            redirectStrategy.sendRedirect(request, response, "/instructor/instructor_view?user_id="
-                    +userId+"&instructor_id="+instructorId);
+            int instructorId = userService.getSpecificId(currentUserId,2);
+            redirectStrategy.sendRedirect(request, response, "/instructor/instructor_view?current_user_id="
+                    +currentUserId+"&instructor_id="+instructorId);
         }else {
-            int studentId = userService.getSpecificId(userId,3);
-            redirectStrategy.sendRedirect(request, response, "/student/student_view?user_id="
-                    +userId+"&student_id="+ studentId);
+            int studentId = userService.getSpecificId(currentUserId,3);
+            redirectStrategy.sendRedirect(request, response, "/student/student_view?current_user_id="
+                    +currentUserId+"&student_id="+ studentId);
         }
 
     }

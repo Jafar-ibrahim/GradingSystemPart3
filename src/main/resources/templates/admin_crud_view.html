@@ -180,7 +180,7 @@
             background-color: #339900;
         }
     </style>
-    <script type="text/javascript" th:inline="javascript">
+    <script th:with="baseUrl=@{'/admin/crud/' + ${table} + '/'}" th:inline="javascript">
         /*<![CDATA[*/
         document.addEventListener("DOMContentLoaded", function () {
             handleAction();
@@ -188,14 +188,14 @@
 
         function handleAction() {
             var selectedAction = document.getElementById("Action").value;
-
+            var form = document.getElementById("crud_form");
             var firstInputElement = document.querySelector('.first-input');
             var otherInputElements = document.querySelectorAll('.non-primary-key');
+            var baseUrl = /*[[ @{'/admin/crud/'+ ${table}+ '/'} ]]*/ "";
 
             if (firstInputElement) {
                 firstInputElement.disabled = (selectedAction === 'add');
                 var isDisabled = firstInputElement.disabled;
-
                 var blockedTextElement = firstInputElement.nextElementSibling;
 
                 if (isDisabled) {
@@ -207,9 +207,12 @@
                     firstInputElement.classList.remove('blocked');
                 }
             }
-
+            if (selectedAction === 'add'){
+                form.action = /*[[${baseUrl + 'add'}]]*/ "";
+            }
             var updateText = document.querySelector('.update-text');
             if (selectedAction === 'update') {
+                form.action = /*[[${baseUrl + 'update'}]]*/ "";
                 if (updateText) {
                     updateText.style.display = 'block';
                 }
@@ -218,6 +221,7 @@
             }
 
             if (selectedAction === 'delete') {
+                form.action = /*[[${baseUrl + 'delete'}]]*/ "";
                 otherInputElements.forEach(function (element) {
                     element.style.display = 'none';
                 });
@@ -226,13 +230,17 @@
                     element.style.display = 'block';
                 });
             }
+
+            // Debugging statement
+            console.log("Selected Action:", selectedAction);
+            console.log("Selected Action:",form.action);
         }
         /*]]>*/
     </script>
 </head>
 
 <body>
-<form th:action="@{logout}" method="post">
+<form th:action="@{/logout}" method="POST">
     <button type="submit" class="logout-button">Logout</button>
 </form>
 
@@ -256,9 +264,9 @@
 
 </div>
 
-<form th:action="@{/admin/crud}" method="POST">
+<form id="crud_form" th:action="@{/admin/crud}" method="POST">
     <div class="actions">
-        <a class="back-link" th:href="@{/admin_view(user_id=${param.user_id})}">Go Back</a>
+        <a class="back-link" th:href="@{/admin/admin_view(current_user_id=${param.current_user_id})}">Go Back</a>
         <div th:if="${param.error}">
             <div class="error-message active">
                 <span th:text="${param.error}"></span>
@@ -278,7 +286,8 @@
             </div>
         </select>
 
-        <div class="update-text" style="color: #D8000C;display: none"> Fill the fields you want to change only.</div>
+        <div class="update-text" style="color: #D8000C;display: none">
+            Fill the fields you want to change only.</div>
 
         <div th:each="column, status : ${columns}">
             <br>
@@ -297,7 +306,7 @@
             <br>
         </div>
 
-        <input type="hidden" name="user_id" th:value="${user_id}">
+        <input type="hidden" name="current_user_id" th:value="${param.current_user_id}">
         <input type="hidden" name="instructor_id" th:value="${admin_id}">
         <input type="hidden" name="table" th:value="${table}">
         <button class="save-button" type="submit">Save</button>

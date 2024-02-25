@@ -134,8 +134,8 @@
         <div class="card small">
             <h4>Manage Courses</h4>
             <p>Perform CRUD operations on the courses.</p>
-            <form th:action="@{/crud_view}" method="GET">
-                <input type="hidden" name="user_id" th:value="${param.user_id}">
+            <form th:action="@{/admin/crud_view}" method="GET">
+                <input type="hidden" name="current_user_id" th:value="${param.current_user_id}">
                 <input type="hidden" name="table" th:value="'course'">
                 <div class="button-container">
                     <button type="submit">View Courses</button>
@@ -145,9 +145,9 @@
         <div class="card small">
             <h4>Manage Sections</h4>
             <p>Perform CRUD operations on the sections.</p>
-            <form th:action="@{/admin/crud}" method="GET">
-                <input type="hidden" name="user_id" th:value="${user_id}">
-                <input type="hidden" name="admin_id" th:value="${admin_id}">
+            <form th:action="@{/admin/crud_view}" method="GET">
+                <input type="hidden" name="current_user_id" th:value="${param.current_user_id}">
+                <input type="hidden" name="admin_id" th:value="${param.admin_id}">
                 <input type="hidden" name="table" th:value="'section'">
                 <div class="button-container">
                     <button type="submit">View Sections</button>
@@ -157,9 +157,9 @@
         <div class="card small">
             <h4>Manage Users</h4>
             <p>Perform CRUD operations on the users (students & instructors).</p>
-            <form th:action="@{/admin/crud}" method="GET">
-                <input type="hidden" name="user_id" th:value="${user_id}">
-                <input type="hidden" name="admin_id" th:value="${admin_id}">
+            <form th:action="@{/admin/crud_view}" method="GET">
+                <input type="hidden" name="current_user_id" th:value="${param.current_user_id}">
+                <input type="hidden" name="admin_id" th:value="${param.admin_id}">
                 <input type="hidden" name="table" th:value="'user'">
                 <div class="button-container">
                     <button type="submit">View Users</button>
@@ -169,9 +169,9 @@
         <div class="card">
             <h4>Manage Instructor Sections</h4>
             <p>Assign/Remove instructors to/from sections.</p>
-            <form th:action="@{/admin/crud}" method="GET">
-                <input type="hidden" name="user_id" th:value="${user_id}">
-                <input type="hidden" name="admin_id" th:value="${admin_id}">
+            <form th:action="@{/admin/crud_view}" method="GET">
+                <input type="hidden" name="current_user_id" th:value="${param.current_user_id}">
+                <input type="hidden" name="admin_id" th:value="${param.admin_id}">
                 <input type="hidden" name="table" th:value="'instructor_section'">
                 <div class="button-container">
                     <button type="submit">View Instructor Sections</button>
@@ -181,9 +181,9 @@
         <div class="card small">
             <h4>Manage Student Sections</h4>
             <p>Add/Remove students to/from sections.</p>
-            <form th:action="@{/admin/crud}" method="GET">
-                <input type="hidden" name="user_id" th:value="${user_id}">
-                <input type="hidden" name="admin_id" th:value="${admin_id}">
+            <form th:action="@{/admin/crud_view}" method="GET">
+                <input type="hidden" name="current_user_id" th:value="${param.current_user_id}">
+                <input type="hidden" name="admin_id" th:value="${param.admin_id}">
                 <input type="hidden" name="table" th:value="'student_section'">
                 <div class="button-container">
                     <button type="submit">Student Sections</button>
