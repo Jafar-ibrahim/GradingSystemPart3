@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 @Component
@@ -86,22 +87,18 @@ public class Database {
 
     public List<String> getTableColumnsNames(String tableName) {
         List<String> columnsNames = new ArrayList<>();
+        String query = "SELECT column_names FROM column_order WHERE table_name = '"+tableName+"'";
 
-        try (Connection connection = getDatabaseConnection()) {
-            String query = "SELECT COLUMN_NAME " +
-                    "FROM INFORMATION_SCHEMA.COLUMNS " +
-                    "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?";
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, connection.getCatalog()); // Get the current database/schema
-                preparedStatement.setString(2, tableName);
-
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        String columnName = resultSet.getString("COLUMN_NAME");
-                        columnsNames.add(columnName);
-                    }
+        try (ResultSet resultSet = executeQuery(query)) {
+            if (resultSet.next()) {
+                String columnNamesJson = resultSet.getString("column_names");
+                int startIndex = columnNamesJson.indexOf("[") + 1;
+                int endIndex = columnNamesJson.lastIndexOf("]");
+                if (endIndex != -1) {
+                    String[] columnNameArray = columnNamesJson.substring(startIndex, endIndex).split(",");
+                    columnsNames.addAll(Arrays.asList(columnNameArray));
                 }
+                return columnsNames;
             }
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception according to your application's needs

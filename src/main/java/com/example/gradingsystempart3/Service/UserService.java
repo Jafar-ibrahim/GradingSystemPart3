@@ -170,13 +170,9 @@ public class UserService {
         }
     }
     public Optional<User> getByUsername(String username) {
-        try {
-            int id = getIdByUsername(username);
-            return Optional.ofNullable(userDAO.getById(id));
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        int id = getIdByUsername(username);
+        if (id == -1) return Optional.empty();
+        return Optional.ofNullable(getById(id));
     }
     public int getIdByUsername(String username){
         try {

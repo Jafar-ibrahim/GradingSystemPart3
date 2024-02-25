@@ -3,6 +3,7 @@ package com.example.gradingsystempart3.Security;
 
 
 import com.example.gradingsystempart3.Service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -31,9 +32,11 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         String username = authentication.getName();
+        HttpSession session = request.getSession();
         int userId = userService.getIdByUsername(username);
+        //session.setAttribute("user_id",userId);
         if (roles.contains("ADMIN")) {
-            redirectStrategy.sendRedirect(request, response, "/admin/admin_view");
+            redirectStrategy.sendRedirect(request, response, "/admin_view?user_id="+userId);
         }else if(roles.contains("INSTRUCTOR")){
             int instructorId = userService.getSpecificId(userId,2);
             redirectStrategy.sendRedirect(request, response, "/instructor/instructor_view?user_id="

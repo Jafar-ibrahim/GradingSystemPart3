@@ -15,7 +15,7 @@ public class AuthFailureHandler extends SimpleUrlAuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         String error = "Invalid username or password";
-        setDefaultFailureUrl("/login?error=true&message=" + error);
+        setDefaultFailureUrl("/login?error_msg=" + error);
         super.onAuthenticationFailure(request, response, exception);
     }
 }

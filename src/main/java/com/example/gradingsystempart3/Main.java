@@ -1,6 +1,9 @@
 package com.example.gradingsystempart3;
 
 
+import com.example.gradingsystempart3.Model.User;
+import com.example.gradingsystempart3.Service.UserService;
+
 import java.sql.SQLException;
 
 public class Main {
@@ -10,7 +13,6 @@ public class Main {
         schemaManager.dropAllTablesIfExist();
         schemaManager.initializeTables();
         schemaManager.addDummyData();*/
-
 
 
     }

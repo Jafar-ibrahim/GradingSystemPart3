@@ -1,17 +1,19 @@
 package com.example.gradingsystempart3.Database;
 
 import com.example.gradingsystempart3.Service.*;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Random;
-
+@Component
 public class SchemaManager {
     private final Database database = Database.getInstance();
 
     public void initializeTables(){
         try{
+            createColumnOrderTable();
             createRoleTable();
             createUserTable();
             createAdminTable();
@@ -28,7 +30,7 @@ public class SchemaManager {
         }
     }
     public void dropAllTablesIfExist(){
-        String[] tablesNames = new String[]{"instructor_section","student_section","grade","section","course","student","instructor","admin","user","role"};
+        String[] tablesNames = new String[]{"column_order","instructor_section","student_section","grade","section","course","student","instructor","admin","user","role"};
         try(Connection connection = database.getDatabaseConnection();
             Statement statement = connection.createStatement()){
 
@@ -40,12 +42,22 @@ public class SchemaManager {
             System.out.println(sqlException.getMessage());
         }
     }
+    private void createColumnOrderTable() throws SQLException {
+        try(Connection connection = database.getDatabaseConnection();
+            Statement statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE column_order (" +
+                    "table_name VARCHAR(255) PRIMARY KEY," +
+                    "column_names TEXT)");
+        }
+    }
     private void createRoleTable() throws SQLException {
         try(Connection connection = database.getDatabaseConnection();
             Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE role (" +
                     "role_id INT PRIMARY KEY," +
                     "name VARCHAR(255) UNIQUE NOT NULL)");
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'role\', '[role_id,name]')");
         }
     }
     private void createUserTable() throws SQLException {
@@ -59,6 +71,9 @@ public class SchemaManager {
                     "last_name VARCHAR(255)," +
                     "role_id INT," +
                     "FOREIGN KEY (role_id) REFERENCES role(role_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'user\', '[user_id,username,password,first_name,last_name,role_id]')");
         }
     }
     private void createStudentTable() throws SQLException {
@@ -68,6 +83,9 @@ public class SchemaManager {
                     "student_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "user_id INT," +
                     "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'student\', '[student_id,user_id]')");
         }
     }
 
@@ -78,6 +96,9 @@ public class SchemaManager {
                     "instructor_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "user_id INT," +
                     "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'instructor\', '[instructor_id,user_id]')");
         }
     }
 
@@ -88,6 +109,9 @@ public class SchemaManager {
                     "admin_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "user_id INT," +
                     "FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'admin\', '[admin_id,user_id]')");
         }
     }
     private void createCourseTable() throws SQLException {
@@ -96,6 +120,9 @@ public class SchemaManager {
             statement.execute("CREATE TABLE course (" +
                     "course_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "course_name VARCHAR(255) NOT NULL)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'course\', '[course_id,course_name]')");
         }
     }
     private void createGradeTable() throws SQLException {
@@ -108,6 +135,10 @@ public class SchemaManager {
                     "PRIMARY KEY (student_id, section_id)," +
                     "FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (section_id) REFERENCES section(section_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'grade\', '[student_id,section_id,grade]')");
+
         }
     }
     private void createSectionTable() throws SQLException {
@@ -118,6 +149,9 @@ public class SchemaManager {
                     "course_id INT," +
                     /*"course_name VARCHAR(255)," +*/
                     "FOREIGN KEY (course_id) REFERENCES course(course_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'section\', '[section_id,course_id]')");
         }
     }
     private void createStudent_SectionTable() throws SQLException {
@@ -129,6 +163,9 @@ public class SchemaManager {
                     "PRIMARY KEY (student_id, section_id)," +
                     "FOREIGN KEY (student_id) REFERENCES user(user_id)," +
                     "FOREIGN KEY (section_id) REFERENCES section(section_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'student_section\', '[student_id,section_id]')");
         }
     }
     private void createInstructor_SectionTable() throws SQLException {
@@ -140,6 +177,9 @@ public class SchemaManager {
                     "PRIMARY KEY (instructor_id, section_id)," +
                     "FOREIGN KEY (instructor_id) REFERENCES user(user_id)," +
                     "FOREIGN KEY (section_id) REFERENCES section(section_id) ON DELETE CASCADE)");
+
+            statement.execute("INSERT INTO column_order (table_name, column_names)" +
+                    "VALUES (\'instructor_section\', '[instructor_id,section_id]')");
         }
     }
     public void addDummyData()  {

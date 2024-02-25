@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses</title>
+    <style>
+        body {
+            padding-top: 80px;
+            font-family: sans-serif;
+            display: flex;
+            background: #e0e6f6 linear-gradient(to right, #e0e6f6, #d6e2ef);
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px; /* Padding for content within the container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: left; /* Align content to left */
+            width: 60%; /* 50% of screen width */
+            margin: 0 auto;
+
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%; /* Full width within the container */
+            border-collapse: collapse;
+            margin-top: 20px; /* Add top margin for spacing */
+            padding: 15px; /* Add padding for table content */
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #428bca;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Target the "Student Name" column */
+        th:nth-child(2), td:nth-child(2) {
+            width: 50%; /* Adjust width as needed */
+        }
+
+        .section-selector {
+            width: 50%; /* 50% of remaining screen width */
+            padding: 30px; /* Padding for content within the section */
+        }
+
+        select {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px; /* Increased width for the dropdown (1.5 times bigger) */
+            margin-bottom: 10px; /* Add spacing below the dropdown */
+            padding: 10px; /* Add padding for dropdown options */
+        }
+
+        button {
+            background-color: #428bca;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Add margin-top to the button */
+        button {
+            width: 100px;
+            length: 100px;
+            margin-top: 15px; /* Adjust spacing as desired */
+        }
+        .error-message {
+            color: #D8000C;
+            background-color: #FFBABA;
+        }
+
+        .success-message {
+            color: #270;
+            background-color: #DFF2BF;
+        }
+        .error-message,
+        .success-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px 3px 3px 3px;
+        }
+        .error-message.active,
+        .success-message.active {
+            display: block;
+        }
+        .blocked {
+            background-color: #666; /* Medium-dark gray color for disabled state */
+            color: #fff; /* Text color for better contrast */
+        }
+        .blocked-text {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            width: 250px;
+        }
+
+        .actions {
+            width: 50%; /* 50% of remaining screen width */
+            padding: 30px; /* Padding for content within the section */
+            display: flex;
+            flex-direction: column;
+        }
+
+        select, input {
+            margin-bottom: 10px; /* Add spacing between dropdown and inputs */
+        }
+        .logout-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background-color: #428bca;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 20px;
+            text-decoration: none
+        }
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+        .logout-button,
+        .back-link {
+            position: absolute;
+            background-color: #428bca;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 20px;
+            text-decoration: none
+        }
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+        .logout-button {
+            top: 25px;
+            left: 25px;
+        }
+        .back-link {
+            top: 25px;
+            right: 25px;
+        }
+        .back-link:hover {
+            background-color: #cccc00;
+        }
+        .save-button:hover {
+            background-color: #339900;
+        }
+    </style>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener("DOMContentLoaded", function () {
+            handleAction();
+        });
+
+        function handleAction() {
+            var selectedAction = document.getElementById("Action").value;
+
+            var firstInputElement = document.querySelector('.first-input');
+            var otherInputElements = document.querySelectorAll('.non-primary-key');
+
+            if (firstInputElement) {
+                firstInputElement.disabled = (selectedAction === 'add');
+                var isDisabled = firstInputElement.disabled;
+
+                var blockedTextElement = firstInputElement.nextElementSibling;
+
+                if (isDisabled) {
+                    blockedTextElement.style.display = 'block';
+                    firstInputElement.value = '';
+                    firstInputElement.classList.add('blocked');
+                } else {
+                    blockedTextElement.style.display = 'none';
+                    firstInputElement.classList.remove('blocked');
+                }
+            }
+
+            var updateText = document.querySelector('.update-text');
+            if (selectedAction === 'update') {
+                if (updateText) {
+                    updateText.style.display = 'block';
+                }
+            } else {
+                updateText.style.display = 'none';
+            }
+
+            if (selectedAction === 'delete') {
+                otherInputElements.forEach(function (element) {
+                    element.style.display = 'none';
+                });
+            } else {
+                otherInputElements.forEach(function (element) {
+                    element.style.display = 'block';
+                });
+            }
+        }
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+<form th:action="@{logout}" method="post">
+    <button type="submit" class="logout-button">Logout</button>
+</form>
+
+<div class="container">
+    <h2 th:text="${tableCapitalized} + ' Table'"></h2>
+    <div th:if="${table eq 'user'}">
+        <h3 style="color: #D8000C"> Note : role_id values 1,2,3 mean Admin,Instructor,Student respectively.</h3>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th th:each="column : ${columns}" th:text="${column}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${content}">
+            <td th:each="value : ${entry}" th:text="${value}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<form th:action="@{/admin/crud}" method="POST">
+    <div class="actions">
+        <a class="back-link" th:href="@{/admin_view(user_id=${param.user_id})}">Go Back</a>
+        <div th:if="${param.error}">
+            <div class="error-message active">
+                <span th:text="${param.error}"></span>
+            </div>
+        </div>
+        <div th:if="${param.success}">
+            <div class="success-message active">
+                <span th:text="${param.success}"></span>
+            </div>
+        </div>
+        <h3>Course Actions:</h3>
+        <select id="Action" name="action" th:onchange="handleAction()">
+            <option value="add" th:text="'Add ' + ${table}"></option>
+            <option value="delete" th:text="'Delete ' + ${table}" selected></option>
+            <div th:if="${table ne 'student_section' and table ne 'instructor_section'}">
+                <option value="update"  th:text="'Modify ' + ${table}"></option>
+            </div>
+        </select>
+
+        <div class="update-text" style="color: #D8000C;display: none"> Fill the fields you want to change only.</div>
+
+        <div th:each="column, status : ${columns}">
+            <br>
+            <div th:if="${table ne 'student_section' and table ne 'instructor_section'}">
+                <label th:for="${column}"
+                       th:class="${status.index == 0} ? 'primary-key' : 'non-primary-key'" th:text="${column}"></label>
+                <input type="text" th:id="${column}" th:name="${column}"
+                       th:class="${status.index == 0} ? 'first-input primary-key' : 'non-primary-key'">
+                <div class="blocked-text" style="display: none;">Blocked ( ID is auto-generated )</div>
+            </div>
+
+            <div th:if="${table == 'student_section' or table == 'instructor_section'}">
+                <label th:for="${column}" th:text="${column}"></label>
+                <input type="text" th:id="${column}" th:name="${column}">
+            </div>
+            <br>
+        </div>
+
+        <input type="hidden" name="user_id" th:value="${user_id}">
+        <input type="hidden" name="instructor_id" th:value="${admin_id}">
+        <input type="hidden" name="table" th:value="${table}">
+        <button class="save-button" type="submit">Save</button>
+    </div>
+</form>
+
+</body>
+
+</html>
