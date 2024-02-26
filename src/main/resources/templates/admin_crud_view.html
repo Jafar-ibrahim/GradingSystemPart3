@@ -191,7 +191,6 @@
             var form = document.getElementById("crud_form");
             var firstInputElement = document.querySelector('.first-input');
             var otherInputElements = document.querySelectorAll('.non-primary-key');
-            var baseUrl = /*[[ @{'/admin/crud/'+ ${table}+ '/'} ]]*/ "";
 
             if (firstInputElement) {
                 firstInputElement.disabled = (selectedAction === 'add');
@@ -231,9 +230,6 @@
                 });
             }
 
-            // Debugging statement
-            console.log("Selected Action:", selectedAction);
-            console.log("Selected Action:",form.action);
         }
         /*]]>*/
     </script>

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/admin/crud/section")
 public class AdminCrudSectionController {
     private final SectionService sectionService;
-    private int currentUserId;
+    
 
     @Autowired
     public AdminCrudSectionController(SectionService sectionService) {
@@ -23,31 +23,31 @@ public class AdminCrudSectionController {
     @PostMapping("/add")
     public String addSection(@RequestParam("current_user_id") int currentUserId,
                             @RequestParam(value = "course_id",required = false) Integer courseId){
-        this.currentUserId = currentUserId;
+        
         if(filled(courseId)){
             if(CourseService.courseExists(courseId)){
                 sectionService.addSection(courseId);
-                return redirectSuccess("Section added successfully");
+                return redirectSuccess(currentUserId,"Section added successfully");
             }else{
-                return redirectError("No Course exists with this ID");
+                return redirectError(currentUserId,"No Course exists with this ID");
             }
         }else{
-            return redirectError("Please enter all necessary info");
+            return redirectError(currentUserId,"Please enter all necessary info");
         }
     }
     @PostMapping("/delete")
     public String deleteSection(@RequestParam("current_user_id") int currentUserId,
                                @RequestParam(value = "section_id",required = false) Integer sectionId){
-        this.currentUserId = currentUserId;
+        
         if(filled(sectionId)){
             if(SectionService.sectionExists(sectionId)) {
                 sectionService.deleteSection(sectionId);
-                return redirectSuccess("Section deleted successfully");
+                return redirectSuccess(currentUserId,"Section deleted successfully");
             }else {
-                return redirectError("Section does not exist");
+                return redirectError(currentUserId,"Section does not exist");
             }
         }else {
-            return redirectError("Please enter all necessary info");
+            return redirectError(currentUserId,"Please enter all necessary info");
         }
     }
     @PostMapping("/update")
@@ -60,21 +60,21 @@ public class AdminCrudSectionController {
             if (filled(courseId)){
                 if(CourseService.courseExists(courseId)) {
                     database.updateRecord("section", "course_id", courseId, sectionId);
-                    return redirectSuccess("Section updated successfully");
+                    return redirectSuccess(currentUserId,"Section updated successfully");
                 }else {
-                    return redirectError("Course does not exist");
+                    return redirectError(currentUserId,"Course does not exist");
                 }
             }else{
-                return redirectSuccess("No changes were made.");
+                return redirectSuccess(currentUserId,"No changes were made.");
             }
         }else {
-            return redirectError("Please enter the Section ID");
+            return redirectError(currentUserId,"Please enter the Section ID");
         }
     }
-    private String redirectSuccess(String msg){
+    private String redirectSuccess(int currentUserId,String msg){
         return "redirect:/admin/crud_view?table=section&current_user_id="+currentUserId+"&success="+msg;
     }
-    private String redirectError(String msg){
+    private String redirectError(int currentUserId,String msg){
         return "redirect:/admin/crud_view?table=section&current_user_id="+currentUserId+"&error="+msg;
     }
 

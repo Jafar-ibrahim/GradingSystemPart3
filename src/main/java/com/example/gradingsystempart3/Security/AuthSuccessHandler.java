@@ -32,9 +32,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         String username = authentication.getName();
-        HttpSession session = request.getSession();
         int currentUserId = userService.getIdByUsername(username);
-        //session.setAttribute("user_id",userId);
         if (roles.contains("ADMIN")) {
             redirectStrategy.sendRedirect(request, response, "/admin/admin_view?current_user_id="+currentUserId);
         }else if(roles.contains("INSTRUCTOR")){

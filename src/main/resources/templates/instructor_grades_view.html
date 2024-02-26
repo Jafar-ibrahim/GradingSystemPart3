@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section Grades</title>
+    <style>
+        body {
+            padding-top: 80px;
+            font-family: sans-serif;
+            display: flex;
+            background: #e0e6f6 linear-gradient(to right, #e0e6f6, #d6e2ef);
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px; /* Padding for content within the container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: left; /* Align content to left */
+            width: 50%; /* 50% of screen width */
+            margin: 0 auto;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%; /* Full width within the container */
+            border-collapse: collapse;
+            margin-top: 20px; /* Add top margin for spacing */
+            padding: 15px; /* Add padding for table content */
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #428bca;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Target the "Student Name" column */
+        th:nth-child(2), td:nth-child(2) {
+            width: 50%; /* Adjust width as needed */
+        }
+
+        .section-selector {
+            width: 50%; /* 50% of remaining screen width */
+            padding: 30px; /* Padding for content within the section */
+        }
+
+        select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px; /* Increased width for the dropdown (1.5 times bigger) */
+            margin-bottom: 10px; /* Add spacing below the dropdown */
+            padding: 10px; /* Add padding for dropdown options */
+        }
+
+        button {
+            background-color: #428bca;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Add margin-top to the button */
+        button {
+            width: 100px;
+            length: 100px;
+            margin-top: 15px; /* Adjust spacing as desired */
+        }
+
+        .error-message {
+            color: #D8000C;
+            background-color: #FFBABA;
+        }
+
+        .success-message {
+            color: #270;
+            background-color: #DFF2BF;
+        }
+
+        .error-message,
+        .success-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px 3px 3px 3px;
+        }
+
+        .error-message.active,
+        .success-message.active {
+            display: block;
+        }
+
+        .grade-actions {
+            width: 50%; /* 50% of remaining screen width */
+            padding: 30px; /* Padding for content within the section */
+            display: flex;
+            flex-direction: column;
+        }
+
+        select,
+        input {
+            margin-bottom: 10px; /* Add spacing between dropdown and inputs */
+        }
+
+        .logout-button,
+        .back-link {
+            position: absolute;
+            background-color: #428bca;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 20px;
+            text-decoration: none
+        }
+
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+
+        .logout-button {
+            top: 25px;
+            left: 25px;
+        }
+
+    </style>
+    <script th:with="baseUrl=@{'/instructor/crud/grades/'}" th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener("DOMContentLoaded", function () {
+            handleAction();
+        });
+
+        function handleAction() {
+            var selectedAction = document.getElementById("Action").value;
+            var form = document.getElementById("crud_form");
+            var grade_field = document.querySelectorAll(".grade-fields");
+
+            if (selectedAction === 'add'){
+                form.action = /*[[${baseUrl + 'add'}]]*/ "";
+            }else if (selectedAction === 'update') {
+                form.action = /*[[${baseUrl + 'update'}]]*/ "";
+            }
+            if (selectedAction === 'delete') {
+                form.action = /*[[${baseUrl + 'delete'}]]*/ "";
+                grade_field.forEach(function (element) {
+                    element.style.display = 'none';
+                });
+            }else{
+                    grade_field.forEach(function (element) {
+                        element.style.display = 'block';
+                    });
+            }
+            console.log(selectedAction);
+            console.log(/*[[${baseUrl + 'add'}]]*/ "");
+
+        }
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="logout-button">Logout</button>
+    </form>
+    <h2>Section <strong th:text="${section_id}"></strong> Grades</h2>
+    <h3>Course : <strong th:text="${course_name}"></strong></h3>
+    <h3>Instructor : <strong th:text="${instructor_name}"></strong></h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Student ID</th>
+            <th>Student Name</th>
+            <th>Grade</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="grade : ${section_grades}">
+            <td th:text="${grade.studentId}"></td>
+            <td th:text="${grade.studentFullName}"></td>
+            <td th:text="${grade.grade}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<form th:action="@{/instructor/crud/grades}" method="get">
+    <div class="section-selector">
+        <h3>Select Section:</h3>
+        <select id="sectionId" name="section_id">
+            <option th:each="section : ${sections}" th:value="${section.id}" th:text="${section.id}"></option>
+        </select>
+        <br>
+        <input type="hidden" name="current_user_id" th:value="${user_id}">
+        <input type="hidden" name="instructor_id" th:value="${instructor_id}">
+        <button type="submit">View Grades</button>
+    </div>
+</form>
+
+<form id="crud_form" th:action="@{/instructor/crud/grades}" method="post">
+    <div class="grade-actions">
+        <div th:if="${error != null}" class="error-message active">
+            <span th:text="${error}"></span>
+        </div>
+        <div th:if="${success != null}" class="success-message active">
+            <span th:text="${success}"></span>
+        </div>
+        <h3>Grade Actions:</h3>
+        <select id="Action" name="action" onchange="handleAction()">
+            <option value="add">Add Grade</option>
+            <option value="delete">Delete Grade</option>
+            <option value="update">Modify Grade</option>
+        </select>
+        <br>
+        <label for="studentId">Student ID:</label>
+        <input type="text" id="studentId" name="student_id">
+        <br>
+        <label class="grade-fields" for="grade">Grade:</label>
+        <input type="text" id="grade" name="grade" class="grade-fields">
+        <br>
+        <input type="hidden" name="section_id" th:value="${section_id}">
+        <input type="hidden" name="current_user_id" th:value="${user_id}">
+        <input type="hidden" name="instructor_id" th:value="${instructor_id}">
+
+        <button type="submit">Save</button>
+    </div>
+</form>
+
+</body>
+
+</html>

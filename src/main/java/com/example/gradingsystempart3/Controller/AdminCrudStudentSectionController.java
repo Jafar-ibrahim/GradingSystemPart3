@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminCrudStudentSectionController {
     EnrollmentService enrollmentService;
 
-    private int currentUserId;
+    
 
     @Autowired
     public AdminCrudStudentSectionController(EnrollmentService enrollmentService) {
@@ -25,44 +25,44 @@ public class AdminCrudStudentSectionController {
     public String addStudentToSection(@RequestParam("current_user_id") int currentUserId,
                                          @RequestParam(value = "student_id",required = false) Integer studentId,
                                          @RequestParam(value = "section_id",required = false) Integer sectionId){
-        this.currentUserId = currentUserId;
+        
         if(filled(studentId) && filled(sectionId)){
             if(!enrollmentService.studentSectionExists(studentId,sectionId)) {
                 if(!SectionService.sectionExists(sectionId)){
-                    return redirectError("No Section exists with the given ID");
+                    return redirectError(currentUserId,"No Section exists with the given ID");
                 }else if(!UserService.studentExists(studentId)){
-                    return redirectError("No Student exists with the given ID");
+                    return redirectError(currentUserId,"No Student exists with the given ID");
                 }else {
                     enrollmentService.addStudentToSection(studentId,sectionId);
-                    return redirectSuccess("Student Added to Section successfully");
+                    return redirectSuccess(currentUserId,"Student Added to Section successfully");
                 }
             }else {
-                return redirectError("A record already exists with the given IDs");
+                return redirectError(currentUserId,"A record already exists with the given IDs");
             }
         }else {
-            return redirectError("Please enter all necessary info");
+            return redirectError(currentUserId,"Please enter all necessary info");
         }
     }
     @PostMapping("/delete")
     public String deleteStudentFromSection(@RequestParam("current_user_id") int currentUserId,
                                               @RequestParam(value = "student_id",required = false) Integer studentId,
                                               @RequestParam(value = "section_id",required = false) Integer sectionId){
-        this.currentUserId = currentUserId;
+        
         if(filled(sectionId) && filled(studentId)){
             if(enrollmentService.studentSectionExists(studentId,sectionId)) {
                 enrollmentService.removeStudentFromSection(studentId,sectionId);
-                return redirectSuccess("Student removed from Section successfully");
+                return redirectSuccess(currentUserId,"Student removed from Section successfully");
             }else {
-                return redirectError("No record exists with the given IDs");
+                return redirectError(currentUserId,"No record exists with the given IDs");
             }
         }else {
-            return redirectError("Please enter all necessary info");
+            return redirectError(currentUserId,"Please enter all necessary info");
         }
     }
-    private String redirectSuccess(String msg){
+    private String redirectSuccess(int currentUserId,String msg){
         return "redirect:/admin/crud_view?table=student_section&current_user_id="+currentUserId+"&success="+msg;
     }
-    private String redirectError(String msg){
+    private String redirectError(int currentUserId,String msg){
         return "redirect:/admin/crud_view?table=student_section&current_user_id="+currentUserId+"&error="+msg;
     }
 

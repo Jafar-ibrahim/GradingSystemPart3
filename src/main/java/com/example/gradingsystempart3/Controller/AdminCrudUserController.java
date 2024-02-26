@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/admin/crud/user")
 public class AdminCrudUserController {
     private final UserService userService;
-    private int currentUserId;
+    
     @Autowired
     public AdminCrudUserController(UserService userService) {
         this.userService = userService;
@@ -32,38 +32,38 @@ public class AdminCrudUserController {
                           @RequestParam("first_name") String firstName,
                           @RequestParam("last_name") String lastName,
                           @RequestParam(value = "role_id",required = false) Integer roleId){
-        this.currentUserId = currentUserId;
+        
         if(filled(username) && filled(password) && filled(firstName) && filled(lastName) && filled(roleId)){
             if(userService.getIdByUsername(username) == -1){
                 if(roleId == 2){
                     userService.addInstructor(username,password,firstName,lastName);
-                    return redirectSuccess("Instructor added successfully");
+                    return redirectSuccess(currentUserId,"Instructor added successfully");
                 }else if (roleId == 3){
                     userService.addStudent(username,password,firstName,lastName);
-                    return redirectSuccess("Student added successfully");
+                    return redirectSuccess(currentUserId,"Student added successfully");
                 }else {
-                    return redirectError("Invalid role ID , enter 2 or 3");
+                    return redirectError(currentUserId,"Invalid role ID , enter 2 or 3");
                 }
             }else{
-                return redirectError("A user exists with this username");
+                return redirectError(currentUserId,"A user exists with this username");
             }
         }else {
-            return redirectError("Please enter all necessary info");
+            return redirectError(currentUserId,"Please enter all necessary info");
         }
     }
     @PostMapping("/delete")
     public String deleteUser(@RequestParam("current_user_id") int currentUserId,
                                 @RequestParam(value = "user_id",required = false) Integer userId){
-        this.currentUserId = currentUserId;
+        
         if(filled(userId)){
             if(UserService.userExists(userId)) {
                 userService.deleteUser(userId);
-                return redirectSuccess("User deleted successfully");
+                return redirectSuccess(currentUserId,"User deleted successfully");
             }else {
-                return redirectError("User does not exist");
+                return redirectError(currentUserId,"User does not exist");
             }
         }else {
-            return redirectError("Please enter the user ID");
+            return redirectError(currentUserId,"Please enter the user ID");
         }
     }
     @PostMapping("/update")
@@ -74,7 +74,7 @@ public class AdminCrudUserController {
                              @RequestParam("first_name") String firstName,
                              @RequestParam("last_name") String lastName,
                              @RequestParam(value = "role_id",required = false) Integer roleId){
-        this.currentUserId = currentUserId;
+        
 
         Database database = Database.getInstance();
         Map<String,Object> columns = new HashMap<>();
@@ -96,7 +96,7 @@ public class AdminCrudUserController {
                                 newValue = PasswordAuthenticator.hashPassword((String) newValue);
                             }
                             if (column.equals("username") && userService.getIdByUsername(username) != -1){
-                                return redirectError("A user exists with this username");
+                                return redirectError(currentUserId,"A user exists with this username");
                             }
                             database.updateRecord("user", column, newValue, userId);
                             updated = true;
@@ -104,20 +104,20 @@ public class AdminCrudUserController {
                     }
                 }
                 if (updated){
-                    return redirectSuccess("User updated successfully");
+                    return redirectSuccess(currentUserId,"User updated successfully");
                 }else
-                    return redirectSuccess("No changes were made.");
+                    return redirectSuccess(currentUserId,"No changes were made.");
             }else {
-                return redirectError("User does not exist");
+                return redirectError(currentUserId,"User does not exist");
             }
         }else {
-            return redirectError("Please enter the user ID");
+            return redirectError(currentUserId,"Please enter the user ID");
         }
     }
-    private String redirectSuccess(String msg){
+    private String redirectSuccess(int currentUserId,String msg){
         return "redirect:/admin/crud_view?table=user&current_user_id="+currentUserId+"&success="+msg;
     }
-    private String redirectError(String msg){
+    private String redirectError(int currentUserId,String msg){
         return "redirect:/admin/crud_view?table=user&current_user_id="+currentUserId+"&error="+msg;
     }
 
