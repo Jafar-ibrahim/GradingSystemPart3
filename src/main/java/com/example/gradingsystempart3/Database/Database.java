@@ -16,16 +16,13 @@ import java.util.StringJoiner;
 @Component
 public class Database {
     private static final String SERVER_NAME = "localhost";
-    private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "qwerty";
-    private static final String DB_DATABASE = "grading_system";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "qwerty";
+    private static final String SCHEMA = "grading_system";
     private static final DataSource DATA_SOURCE = getDataSource();
 
 
     private static Database instance;
-    private Database() {
-
-    }
 
     public synchronized static Database getInstance() {
         if (instance == null)
@@ -36,9 +33,9 @@ public class Database {
         try {
             MysqlDataSource ds = new MysqlDataSource();
             ds.setServerName(SERVER_NAME);
-            ds.setDatabaseName(DB_DATABASE);
-            ds.setUser(DB_USERNAME);
-            ds.setPassword(DB_PASSWORD);
+            ds.setDatabaseName(SCHEMA);
+            ds.setUser(USERNAME);
+            ds.setPassword(PASSWORD);
             ds.setUseSSL(false);
             ds.setAllowPublicKeyRetrieval(true);
 
